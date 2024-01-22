@@ -151,38 +151,25 @@ async function askQuestion(question) {
 
 async function createAssistant() {
   try {
-    const assistantFilePath = "./assistant.json";
+    // Try to get the assistant ID from an environment variable
+    let assistantId = process.env.ASSISTANT_ID;
 
-    let assistantId;
-
-    try {
-      const assistantData = await fsPromises.readFile(
-        assistantFilePath,
-        "utf8"
-      );
-      assistantDetails = JSON.parse(assistantData);
-      assistantId = assistantDetails.assistantId;
-      console.log("\nExisting assistant detected.\n");
-    } catch (error) {
-      // If the file does not exist or there is an error in reading it, create a new assistant
+    if (!assistantId) {
       console.log("No existing assistant detected, creating new.\n");
       const assistantConfig = {
         name: "Murder mystery helper",
         instructions:
           "You're a murder mystery assistant, helping solve murder mysteries.",
-        tools: [{ type: "retrieval" }], // configure the retrieval tool to retrieve files in the future
+        tools: [{ type: "retrieval" }],
         model: "gpt-4-1106-preview",
       };
 
       const assistant = await openai.beta.assistants.create(assistantConfig);
-      assistantDetails = { assistantId: assistant.id, ...assistantConfig };
+      assistantId = assistant.id;
 
-      // Save the assistant details to assistant.json
-      await fsPromises.writeFile(
-        assistantFilePath,
-        JSON.stringify(assistantDetails, null, 2)
-      );
-      assistantId = assistantDetails.assistantId;
+      // You should set the new assistant ID in your environment variables
+      // Note: This won't work on a read-only file system, just a placeholder
+      process.env.ASSISTANT_ID = assistantId;
     }
 
     return assistantId;
@@ -208,7 +195,6 @@ app.post("/ask", async (req, res) => {
       userQuestion
     );
 
-    // Return the response as JSON
     res.json({ response });
   } catch (error) {
     console.error(error);
