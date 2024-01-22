@@ -126,6 +126,8 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const OpenAI = require("openai");
+const cors = require("cors");
+
 const fsPromises = require("fs").promises;
 const readline = require("readline").createInterface({
   input: process.stdin,
@@ -133,6 +135,7 @@ const readline = require("readline").createInterface({
 });
 
 const app = express();
+app.use(cors());
 const port = process.env.PORT || 8880;
 
 // Create an OpenAI connection
