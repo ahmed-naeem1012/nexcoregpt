@@ -213,7 +213,11 @@ app.post("/submitName", (req, res) => {
     }
 
     // Returning the user's name in a JSON object
-    res.json({ name: userName, key: process.env.OPENAI_API_KEY });
+    res.json({
+      name: userName,
+      key: process.env.OPENAI_API_KEY,
+      assistantkey: process.env.ASSISTANT_ID,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
